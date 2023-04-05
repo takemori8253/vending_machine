@@ -14,10 +14,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth/login');
 });
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::get('/test_view', [App\Http\Controllers\TestUserController::class, 'showList']);
+//Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [App\Http\Controllers\TestUserController::class, 'showList'])->name('home');
+Route::get('/add',[App\Http\Controllers\TestUserController::class, 'showAddForm'])->name('add');
+Route::post('/add',[App\Http\Controllers\TestUserController::class, 'addSubmit'])->name('submit');
+Route::post('/delete{id}', [App\Http\Controllers\TestUserController::class, 'delete'])->name('Submit.delete');

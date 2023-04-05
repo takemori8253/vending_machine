@@ -1,43 +1,36 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Dashboard') }}</div>
+    <h1>商品一覧</h1>
 
-                <div class="card-body">
-                    @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
-                    @endif
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>商品名</th>
+                <th>価格</th>
+                <th>在庫数</th>
+                <th>商品説明</th>
+                <th>画像</th>
+                <th>作成日</th>
+                <th>更新日</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($articles as $article)
+                <tr>
+                    <td>{{ $article->product_name }}</td>
+                    <td>{{ $article->price }}</td>
+                    <td>{{ $article->stock }}</td>
+                    <td>{{ $article->comment }}</td>
+                    <td>{{ $article->img_path }}</td>
+                    <td>{{ $article->created_at }}</td>
+                    <td>{{ $article->updated_at }}</td>
+                    <td><a href="" class="btn btn-primary">詳細</a></td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
 
-                    <tr>
-            <th>ID</th>
-            <th>name</th>
-            <th>email</th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach ($articles as $article)
-        <tr>
-            <br>
-            <td>{{ $article->id }}</td>
-            <td>{{ $article->name }}</td>
-            <td>{{ $article->email }}</td>
-            <button type="button" class="btn btn-primary" onclick = location.href="{{ route('register') }}">
-                {{ __('詳細表示') }}
-            </button>
-            <button type="button" class="btn btn-primary" onclick = location.href="{{ route('register') }}">
-                {{ __('削除') }}
-            </button>
-        </tr>
-    @endforeach
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+    <button type="button" onclick=location.href="{{ route('add') }}" class="btn btn-primary">商品登録</button>
 @endsection
