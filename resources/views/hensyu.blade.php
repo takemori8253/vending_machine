@@ -7,7 +7,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('商品新規登録') }}</div>
+                <div class="card-header">{{ __('商品編集') }}</div>
 
                 <div class="card-body">
                     @if (session('status'))
@@ -15,12 +15,17 @@
                             {{ session('status') }}
                         </div>
                     @endif
-            <form method="POST" action="{{ route('submitAddData') }}">
-                @csrf
+            <form method="POST" action="{{ route('updateProduct', ['id' => $id],['product' => $product])}}">
+                @csrf   
+
+                <label for="id">商品ID</label>
+                <div class="form-group">
+                    <td>{{$id}}</td>
+                </div>
 
                 <div class="form-group">
                     <label for="product_name">商品名</label>
-                    <input type="text" class="form-control" id="product_name" name="product_name" placeholder="Product_name" value="{{ old('product_name') }}">
+                    <input type="text" class="form-control" id="product_name" name="product_name" placeholder="Product_name" value="{{ $product->product_name }}">
                     @if($errors->has('product_name'))
                         <p>{{ $errors->first('product_name') }}</p>
                     @endif
@@ -32,12 +37,12 @@
                     @foreach($companies as $company)
                         <option value="{{ $company->id }}">{{ $company->company_name }}</option>
                     @endforeach
-                    </select>
+    </select>
                 </div>
 
                 <div class="form-group">
                     <label for="price">価格</label>
-                    <input type="text" class="form-control" id="price" name="price" placeholder="PRICE" value="{{ old('price') }}">
+                    <input type="text" class="form-control" id="price" name="price" placeholder="PRICE" value="{{ $product->price }}">
                     @if($errors->has('price'))
                         <p>{{ $errors->first('price') }}</p>
                     @endif
@@ -45,7 +50,7 @@
                 
                 <div class="form-group">
                     <label for="stock">在庫数</label>
-                    <input type="text" class="form-control" id="stock" name="stock" placeholder="STOCK" value="{{ old('Stock') }}">
+                    <input type="text" class="form-control" id="stock" name="stock" placeholder="STOCK" value="{{ $product->stock }}">
                     @if($errors->has('price'))
                         <p>{{ $errors->first('price') }}</p>
                     @endif
@@ -53,7 +58,7 @@
 
                 <div class="form-group">
                     <label for="comment">コメント</label>
-                    <textarea class="form-control" id="comment" name="comment" placeholder="Comment">{{ old('comment') }}</textarea>
+                    <textarea class="form-control" id="comment" name="comment" placeholder="Comment">{{ $product->comment }}</textarea>
                     @if($errors->has('comment'))
                         <p>{{ $errors->first('comment') }}</p>
                     @endif
@@ -66,12 +71,12 @@
                         <p>{{ $errors->first('img_path') }}</p>
                     @endif
                 </div>
-
-                <button type="submit" class="btn btn-primary">登録</button>
-                <button type="button" class="btn btn-primary" onclick = location.href="{{ route('home') }}">
-                {{ __('戻る') }}
-            </button>
+                <button type="submit" class="btn btn-primary">編集</button>
             </form>
+            <form action="{{ route('detailForm', ['id'=>$id]) }}" method="POST">
+                @csrf
+                <button class="btn btn-primary" type="submit" >戻る</button>
+                </form>
         </div>
     </div>
 @endsection

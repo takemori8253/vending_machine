@@ -21,19 +21,33 @@ class TestUserController extends Controller
         return view('home');
     }
 
-    public function showList() {
+    public function showList(Request $request){
         // インスタンス生成
+        $article = Article::query();
         $model = new Article();
-        $articles = $model->getList();
 
-        return view('home', ['articles' => $articles]);
+        // ページで入力された情報を取得
+        $keyword = $request->input('keyword');
+        $company_id = $request->input('company_id');
+
+        // articlesテーブルから入力された情報を基にデータを取得
+        $article = $model->getList($keyword,$company_id);
+
+        // companiesテーブルからデータを取得
+        $companies = $model->getCompaniesList();
+        $articles = $article->paginate(3);
+        return view('home', compact('articles', 'companies'));
     }
 
     public function showAddForm() {
-        return view('add');
+        // インスタンス生成
+        $model = new Article();
+        // companiesテーブルからデータを取得
+        $companies = $model->getCompaniesList();
+        return view('add',['companies' => $companies]) ;
     }
 
-    public function addSubmit(ArticleRequest $request) {
+    public function submitAddData(ArticleRequest $request) {
 
         // トランザクション開始
         DB::beginTransaction();
@@ -41,24 +55,64 @@ class TestUserController extends Controller
         try {
             // 登録処理呼び出し
             $model = new Article();
-            $model->addArticle($request);
+            $model->addProductData($request);
             DB::commit();
         } catch (\Exception $e) {
+            // エラー発生時はロールバック処理を行う
             DB::rollback();
             return back();
         }
     
         // 処理が完了したらaddにリダイレクト
-        return redirect(route('add'));
+        return redirect(route('addForm'));
     }
 
-    public function delete($id)
+    public function deleteData($id)
     {
-        // Booksテーブルから指定のIDのレコード1件を取得
+        // インスタンス生成
         $model = new Article();
-        $model->delete_data($id);
+        // 削除処理を呼び出す
+        $model->deleteDataByID($id);
         // 削除したら一覧画面にリダイレクト
         return redirect()->route('home');
+    }
+
+    public function showDetailForm($id) {
+        // インスタンス生成
+        $model = new Article();
+        $articles = $model->getDetailListByID($id);
+
+        return view('syousai', ['articles' => $articles]);
+    }
+
+
+    public function showEditForm($id) {
+        // インスタンス生成
+        $model = new Article();
+        // companiesテーブルからデータを取得
+        $companies = $model->getCompaniesList();
+        // productsテーブルからデータを取得
+        $product = $model->getProductListByID($id);
+        
+        return view('hensyu',compact('companies','id','product')) ;
+    }
+
+    public function updateProduct(ArticleRequest $request,$id) {
+
+        // トランザクション開始
+        DB::beginTransaction();
+    
+        try {
+            // 編集処理呼び出し
+            $model = new Article();
+            $model->updateProductData($request,$id);
+            DB::commit();
+        } catch (\Exception $e) {
+            // エラー発生時はロールバック処理を行う
+            DB::rollback();
+            return back();
+        }
+        return redirect(route('EditForm', ['id'=>$id]) );
     }
 }
 
