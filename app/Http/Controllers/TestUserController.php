@@ -15,11 +15,12 @@ class TestUserController extends Controller
     {
         $this->middleware('auth');
     }
-    
+
     public function index()
     {
         return view('home');
     }
+
 
     public function showList(Request $request){
         // インスタンス生成
@@ -29,13 +30,18 @@ class TestUserController extends Controller
         // ページで入力された情報を取得
         $keyword = $request->input('keyword');
         $company_id = $request->input('company_id');
+        $price_low = $request->input('price_low');
+        $price_up = $request->input('price_up');
+        $stock_low = $request->input('stock_low');
+        $stock_up = $request->input('stock_up');
 
         // articlesテーブルから入力された情報を基にデータを取得
-        $article = $model->getList($keyword,$company_id);
+        $article = $model->getList($keyword, $company_id, $price_low, $price_up, $stock_low, $stock_up);
 
         // companiesテーブルからデータを取得
         $companies = $model->getCompaniesList();
-        $articles = $article->paginate(3);
+        $articles = $article->paginate(100);
+
         return view('home', compact('articles', 'companies'));
     }
 
@@ -51,7 +57,7 @@ class TestUserController extends Controller
 
         // トランザクション開始
         DB::beginTransaction();
-    
+
         try {
             // 登録処理呼び出し
             $model = new Article();
@@ -62,7 +68,7 @@ class TestUserController extends Controller
             DB::rollback();
             return back();
         }
-    
+
         // 処理が完了したらaddにリダイレクト
         return redirect(route('addForm'));
     }
@@ -73,8 +79,6 @@ class TestUserController extends Controller
         $model = new Article();
         // 削除処理を呼び出す
         $model->deleteDataByID($id);
-        // 削除したら一覧画面にリダイレクト
-        return redirect()->route('home');
     }
 
     public function showDetailForm($id) {
@@ -93,7 +97,7 @@ class TestUserController extends Controller
         $companies = $model->getCompaniesList();
         // productsテーブルからデータを取得
         $product = $model->getProductListByID($id);
-        
+
         return view('hensyu',compact('companies','id','product')) ;
     }
 
@@ -101,7 +105,7 @@ class TestUserController extends Controller
 
         // トランザクション開始
         DB::beginTransaction();
-    
+
         try {
             // 編集処理呼び出し
             $model = new Article();

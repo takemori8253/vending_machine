@@ -5,14 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Kyslik\ColumnSortable\Sortable;
 
 class Article extends Model
 {
+    use Sortable;
 
     use HasFactory;
 
     protected $table = 'products';
-    
+
     protected $fillable = [
         'company_id',
         'product_name',
@@ -24,10 +28,12 @@ class Article extends Model
         'updated_at',
     ];
 
-    public function getList($syouhin,$maker) {
+
+
+    public function getList($syouhin, $maker, $price_low, $price_up, $stock_low, $stock_up) {
         // articlesテーブルからデータを取得
         $articles = DB::query();
-        $articles = DB::table('products')
+        $articles = Article::sortable('products')
         ->join('companies', 'products.company_id', '=', 'companies.id')
         ->select('products.id', 'products.img_path', 'products.product_name','products.price','products.stock','companies.company_name' );
 
@@ -35,12 +41,30 @@ class Article extends Model
         if (!empty($syouhin)) {
             $articles->where('products.product_name', 'LIKE', "%{$syouhin}%");
         }
-        
+
         //企業名が指定されていたら、企業名に該当する商品を表示する
         if (!empty($maker)) {
             $articles->where('company_id', $maker);
         }
-        
+
+        if(!empty($price_low)) {
+            $articles->where('price','>=',$price_low);
+        }
+
+        if(!empty($price_up)) {
+            $articles->where('price','<=',$price_up);
+        }
+
+        if(!empty($stock_low)) {
+            $articles->where('stock','>=',$stock_low);
+        }
+
+        if(!empty($stock_up)) {
+            $articles->where('stock','<=',$stock_up);
+        }
+
+        $articles->orderByDesc('products.id');
+
         return $articles;
     }
 
@@ -113,7 +137,7 @@ class Company extends Model
     use HasFactory;
 
     protected $table = 'companies';
-    
+
     protected $fillable = [
         'id',
         'company_name',
